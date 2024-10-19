@@ -50,7 +50,7 @@ def fetch_fasta_fallback(uniprot_id):
     except Exception as e:
         # Handle all exceptions (network issues, invalid ID, etc.)
         # For debugging, uncomment the following line:
-        print(f"Fallback URL Error for {uniprot_id}: {e}", file=sys.stderr)
+        #print(f"Fallback URL Error for {uniprot_id}: {e}", file=sys.stderr)
         return None
 
 def extract_first_sequence(fasta):
