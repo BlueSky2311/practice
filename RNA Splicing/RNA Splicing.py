@@ -1,83 +1,110 @@
 import os
 
-# RNA codon table for translation
+# Standard codon table
 CODON_TABLE = {
-    'AUG': 'M', 'UUU': 'F', 'UUC': 'F', 'UUA': 'L', 'UUG': 'L', 'UCU': 'S', 'UCC': 'S',
-    'UCA': 'S', 'UCG': 'S', 'UAU': 'Y', 'UAC': 'Y', 'UGU': 'C', 'UGC': 'C', 'UGG': 'W',
-    'CUU': 'L', 'CUC': 'L', 'CUA': 'L', 'CUG': 'L', 'CCU': 'P', 'CCC': 'P', 'CCA': 'P',
-    'CCG': 'P', 'CAU': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q', 'CGU': 'R', 'CGC': 'R',
-    'CGA': 'R', 'CGG': 'R', 'AUU': 'I', 'AUC': 'I', 'AUA': 'I', 'ACU': 'T', 'ACC': 'T',
-    'ACA': 'T', 'ACG': 'T', 'AAU': 'N', 'AAC': 'N', 'AAA': 'K', 'AAG': 'K', 'AGU': 'S',
-    'AGC': 'S', 'AGA': 'R', 'AGG': 'R', 'GUU': 'V', 'GUC': 'V', 'GUA': 'V', 'GUG': 'V',
-    'GCU': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A', 'GAU': 'D', 'GAC': 'D', 'GAA': 'E',
-    'GAG': 'E', 'GGU': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G', 'UAA': 'Stop', 'UAG': 'Stop', 'UGA': 'Stop'
+    'UUU':'F', 'CUU':'L', 'AUU':'I', 'GUU':'V',
+    'UUC':'F', 'CUC':'L', 'AUC':'I', 'GUC':'V',
+    'UUA':'L', 'CUA':'L', 'AUA':'I', 'GUA':'V',
+    'UUG':'L', 'CUG':'L', 'AUG':'M', 'GUG':'V',
+    'UCU':'S', 'CCU':'P', 'ACU':'T', 'GCU':'A',
+    'UCC':'S', 'CCC':'P', 'ACC':'T', 'GCC':'A',
+    'UCA':'S', 'CCA':'P', 'ACA':'T', 'GCA':'A',
+    'UCG':'S', 'CCG':'P', 'ACG':'T', 'GCG':'A',
+    'UAU':'Y', 'CAU':'H', 'AAU':'N', 'GAU':'D',
+    'UAC':'Y', 'CAC':'H', 'AAC':'N', 'GAC':'D',
+    'UAA':'Stop', 'CAA':'Q', 'AAA':'K', 'GAA':'E',
+    'UAG':'Stop', 'CAG':'Q', 'AAG':'K', 'GAG':'E',
+    'UGU':'C', 'CGU':'R', 'AGU':'S', 'GGU':'G',
+    'UGC':'C', 'CGC':'R', 'AGC':'S', 'GGC':'G',
+    'UGA':'Stop', 'CGA':'R', 'AGA':'R', 'GGA':'G',
+    'UGG':'W', 'CGG':'R', 'AGG':'R', 'GGG':'G'
 }
 
-# Function to translate RNA to protein using the codon table
-def translate_rna_to_protein(rna):
+def parse_fasta(file_content):
+    fasta_entries = {}
+    current_label = ""
+    current_seq = []
+    for line in file_content:
+        line = line.strip()
+        if line.startswith('>'):
+            if current_label:
+                fasta_entries[current_label] = ''.join(current_seq)
+            current_label = line[1:]
+            current_seq = []
+        else:
+            current_seq.append(line)
+    if current_label:
+        fasta_entries[current_label] = ''.join(current_seq)
+    return fasta_entries
+
+def remove_introns(s, introns):
+    for intron in introns:
+        s = s.replace(intron, '')
+    return s
+
+def transcribe(dna):
+    return dna.replace('T', 'U')
+
+def translate(rna):
     protein = []
     for i in range(0, len(rna), 3):
         codon = rna[i:i+3]
-        amino_acid = CODON_TABLE.get(codon, 'Stop')
-        if amino_acid == 'Stop':
+        if len(codon) < 3:
+            break
+        amino_acid = CODON_TABLE.get(codon, '')
+        if amino_acid == 'Stop' or amino_acid == '':
             break
         protein.append(amino_acid)
     return ''.join(protein)
 
-# Function to remove introns from the DNA sequence
-def remove_introns(dna, introns):
-    for intron in introns:
-        dna = dna.replace(intron, '')
-    return dna
+def main():
+    # Specify the input file path
+    input_file = r"C:\Users\Blue\Downloads\Documents\rosalind_splc.txt"
+    
+    # Read input file
+    try:
+        with open(input_file, 'r') as f:
+            file_content = f.readlines()
+    except FileNotFoundError:
+        print(f"Error: The file {input_file} was not found.")
+        return
+    except Exception as e:
+        print(f"An error occurred while reading the file: {e}")
+        return
+    
+    # Parse FASTA entries
+    fasta_entries = parse_fasta(file_content)
+    
+    # Extract main DNA string (first entry)
+    labels = list(fasta_entries.keys())
+    if not labels:
+        print("Error: No FASTA entries found in the input file.")
+        return
+    main_dna = fasta_entries[labels[0]]
+    
+    # Extract introns (rest of the entries)
+    introns = [fasta_entries[label] for label in labels[1:]]
+    
+    # Remove introns from main DNA
+    exon_dna = remove_introns(main_dna, introns)
+    
+    # Transcribe DNA to RNA
+    rna = transcribe(exon_dna)
+    
+    # Translate RNA to protein
+    protein = translate(rna)
+    
+    # Prepare output file path
+    input_dir = os.path.dirname(input_file)
+    output_file = os.path.join(input_dir, 'output.txt')
+    
+    # Write protein to output file
+    try:
+        with open(output_file, 'w') as f:
+            f.write(protein)
+        print(f"Protein string successfully written to {output_file}")
+    except Exception as e:
+        print(f"An error occurred while writing to the file: {e}")
 
-# Function to transcribe DNA to RNA (replace T with U)
-def transcribe_dna_to_rna(dna):
-    return dna.replace('T', 'U')
-
-# Read input from the .txt file
-input_file = r"C:\Users\Blue\Downloads\Documents\rosalind_splc.txt"  # Replace with your actual input file path
-
-# Extract the directory path of the input file
-input_directory = os.path.dirname(input_file)
-
-# Read the input data
-with open(input_file, 'r') as file:
-    data = file.read().strip().splitlines()
-
-# Debugging step: print the raw input data
-print("Raw input data:", data)
-
-# The first line is the main DNA sequence (s), and the following lines are introns
-dna_sequence = data[0]  # The main DNA string
-introns = data[1:]  # The introns to remove
-
-# Debugging step: print the DNA sequence and introns
-print("DNA sequence before intron removal:", dna_sequence)
-print("Introns:", introns)
-
-# Remove introns from the DNA sequence
-exon_sequence = remove_introns(dna_sequence, introns)
-
-# Debugging step: print the exon sequence after intron removal
-print("Exon sequence after intron removal:", exon_sequence)
-
-# Transcribe the remaining DNA to RNA
-rna_sequence = transcribe_dna_to_rna(exon_sequence)
-
-# Debugging step: print the transcribed RNA sequence
-print("RNA sequence:", rna_sequence)
-
-# Translate the RNA sequence to a protein string
-protein_string = translate_rna_to_protein(rna_sequence)
-
-# Debugging step: print the protein string
-print("Protein string:", protein_string)
-
-# Set the output file path in the same directory as the input file
-output_file = os.path.join(input_directory, "output_protein.txt")
-
-# Write the result to the output file
-with open(output_file, 'w') as file:
-    file.write(protein_string)
-
-print(f"The protein string has been written to {output_file}")
+if __name__ == "__main__":
+    main()
