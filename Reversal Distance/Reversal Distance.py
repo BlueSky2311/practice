@@ -40,7 +40,6 @@ def reversal_distance(start_perm):
     return -1  # Should not reach here for valid permutations
 
 def main():
-    # Change 'input.txt' to your input file's name
     with open(r"C:\Users\Blue\Downloads\Documents\rosalind_rear.txt", 'r') as f:
         # Read all non-empty lines
         data = [line.strip() for line in f if line.strip()]
