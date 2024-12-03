@@ -1,0 +1,95 @@
+import bisect
+
+def find_LIS(sequence):
+    n = len(sequence)
+    tails = []
+    tails_indices = []
+    predecessor = [None] * n
+
+    for i, num in enumerate(sequence):
+        pos = bisect.bisect_left(tails, num)
+        if pos == len(tails):
+            tails.append(num)
+            tails_indices.append(i)
+        else:
+            tails[pos] = num
+            tails_indices[pos] = i
+        if pos != 0:
+            predecessor[i] = tails_indices[pos - 1]
+        else:
+            predecessor[i] = None
+
+    # Reconstruct the LIS
+    lis = []
+    if tails_indices:
+        k = tails_indices[-1]
+        while k is not None:
+            lis.append(sequence[k])
+            k = predecessor[k]
+        lis.reverse()
+    return lis
+
+def find_LDS(sequence):
+    n = len(sequence)
+    tails = []
+    tails_indices = []
+    predecessor = [None] * n
+
+    for i, num in enumerate(sequence):
+        # For LDS, we use the negative of the numbers to utilize bisect for decreasing order
+        num_neg = -num
+        pos = bisect.bisect_left(tails, num_neg)
+        if pos == len(tails):
+            tails.append(num_neg)
+            tails_indices.append(i)
+        else:
+            tails[pos] = num_neg
+            tails_indices[pos] = i
+        if pos != 0:
+            predecessor[i] = tails_indices[pos - 1]
+        else:
+            predecessor[i] = None
+
+    # Reconstruct the LDS
+    lds = []
+    if tails_indices:
+        k = tails_indices[-1]
+        while k is not None:
+            lds.append(sequence[k])
+            k = predecessor[k]
+        lds.reverse()
+    return lds
+
+def read_input(file_path):
+    with open(file_path, 'r') as file:
+        data = file.read().split()
+    n = int(data[0])
+    sequence = list(map(int, data[1:n+1]))
+    return n, sequence
+
+def write_output(file_path, lis, lds):
+    with open(file_path, 'w') as file:
+        file.write(' '.join(map(str, lis)) + '\n')
+        file.write(' '.join(map(str, lds)) + '\n')
+
+def main():
+    input_file = r"C:\Users\Blue\Downloads\Documents\rosalind_lgis.txt"   # Change this
+    output_file = 'rosalind_lgis.txt' # Change this
+
+    n, sequence = read_input(input_file)
+
+    # Validate the input
+    if len(sequence) != n:
+        raise ValueError(f"Expected {n} numbers in the permutation, but got {len(sequence)}.")
+
+    # Find LIS and LDS
+    lis = find_LIS(sequence)
+    lds = find_LDS(sequence)
+
+    # Write results to the output file
+    write_output(output_file, lis, lds)
+
+    print(f"LIS and LDS have been written to '{output_file}'.")
+
+if __name__ == "__main__":
+    main()
