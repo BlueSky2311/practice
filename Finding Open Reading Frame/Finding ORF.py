@@ -150,7 +150,7 @@ def write_output(proteins, output_path):
         exit(1)
 
 def main():
-    # Define the input and output file paths
+    # Define the input file path
     input_path = r"C:\Users\Blue\Downloads\Documents\rosalind_orf.txt"
     
     # Derive the output file path by appending '_output.txt' to the input filename

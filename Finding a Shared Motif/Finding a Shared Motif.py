@@ -34,7 +34,7 @@ def find_longest_common_substring(sequences):
     return longest_common_substring
 
 def main():
-    filename = r"C:\Users\Blue\Desktop\rosalind\Finding a Shared Motif\rosalind_lcsm.txt"  # Change this to the actual input file path
+    filename = r"C:\Users\Blue\Desktop\rosalind\Finding a Shared Motif\rosalind_lcsm.txt"
     sequences = read_fasta(filename)
     longest_common_substring = find_longest_common_substring(sequences)
     print(longest_common_substring)

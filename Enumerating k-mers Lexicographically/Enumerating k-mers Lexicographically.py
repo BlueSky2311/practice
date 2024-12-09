@@ -15,8 +15,7 @@ def lexicographic_strings(file_path):
     
     return result
 
-# Input file path (replace with your file path)
-input_file = "input.txt"  # Change to the actual file path
+input_file = "input.txt"
 
 # Solve the problem
 output = lexicographic_strings(input_file)

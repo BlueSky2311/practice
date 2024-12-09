@@ -65,7 +65,6 @@ def export_to_txt(consensus, profile, output_file):
 
 # Main function
 def main():
-    # Replace with the path to your input .txt file and output .txt file
     input_file = r"C:\Users\Blue\Desktop\rosalind\Consensus and Profile_Finding a Most Likely Common Ancestor\rosalind_cons.txt"
     output_file = r"C:\Users\Blue\Desktop\rosalind\Consensus and Profile_Finding a Most Likely Common Ancestor\results.txt"
     

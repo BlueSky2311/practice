@@ -23,7 +23,7 @@ def calculate_probability(k, N):
 
 def main():
     # Read the input from a .txt file
-    input_file = r"C:\Users\Blue\Desktop\rosalind\Independent Alleles\rosalind_lia.txt"  # Change to the correct file path
+    input_file = r"C:\Users\Blue\Desktop\rosalind\Independent Alleles\rosalind_lia.txt"
     with open(input_file, 'r') as file:
         k, N = map(int, file.readline().strip().split())
     
